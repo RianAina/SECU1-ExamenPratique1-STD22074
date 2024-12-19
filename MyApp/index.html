@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captcha Sequence App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Captcha Sequence App</h1>
+  <form id="numberForm">
+    <label for="numberInput">Enter a number (1-1000):</label>
+    <input type="number" id="numberInput" min="1" max="1000" required>
+    <button type="submit">Submit</button>
+  </form>
+  <ul id="sequenceList"></ul>
+
+    <script>
+    const form = document.getElementById('numberForm');
+    const numberInput = document.getElementById('numberInput');
+    const sequenceList = document.getElementById('sequenceList');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const n = parseInt(numberInput.value, 10);
+      if (isNaN(n) || n < 1 || n > 1000) {
+        alert('Please enter a valid number between 1 and 1000.');
+        return;
+      }
+
+      sequenceList.innerHTML = '';
+
+      for (let i = 1; i <= n; i++) {
+        try {
+          const response = await fetch('https://api.prod.jcloudify.com/whoami');
+          if (response.status === 403) {
+            alert('Captcha required. Please solve it to continue.');
+            break;
+          }
+          const listItem = document.createElement('li');
+          listItem.textContent = `${i}. Forbidden`;
+          sequenceList.appendChild(listItem);
+        } catch (error) {
+          const listItem = document.createElement('li');
+          listItem.textContent = `${i}. Error`;
+          sequenceList.appendChild(listItem);
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    });
+  </script>
+
+        
+      
+
+
+
+
+        
+</body>
+</html>
